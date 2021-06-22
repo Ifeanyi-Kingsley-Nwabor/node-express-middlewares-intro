@@ -6,9 +6,25 @@ const db = require("./database/client");
 app.use(express.json());
 
 app.get("/time", (req, res) => {
-  db.query("SELECT NOW()")
-    .then((data) => res.send(data.rows[0].now))
-    .catch((err) => res.sendStatus(500));
+    // Syntax 1: callbacks
+    //     db.query("SELECT NOW()", (err, data) => {
+    //         if (err) return res.sendStatus(500)
+    //         res.send(data.rows[0].now)
+    // })
+
+    // Syntax 2: promises with then
+    // db
+    //     .query("SELECT NOW()")
+    //     .then(data => res.send(data.rows[0].now))
+    //     .catch(err => res.sendStatus(500))
+
+    // Syntax 3: promises with async/await
+    try {
+        const { rows } = await db.query("SELECT NOW()")
+        res.send(rows[0].now)
+    } catch(e) {
+        res.sendStatus(500)
+    }
 });
 
 app.get("/api/fighters", (req, res) => {
